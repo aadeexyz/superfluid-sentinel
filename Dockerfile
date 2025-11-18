@@ -1,4 +1,4 @@
-FROM node:18-alpine@sha256:3482a20c97e401b56ac50ba8920cc7b5b2022bfc6aa7d4e4c231755770cf892f
+FROM node:lts
 
 # Set environment variables
 ENV NODE_ENV=production
@@ -7,9 +7,13 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 # Install dependencies
-RUN apk add --update --no-cache \
-        yarn \
-        tini
+RUN apt update && apt install -y \
+    git \
+    python3 \
+    make \
+    g++ \
+    ca-certificates \
+    tini 
 
 # Copy package.json and yarn.lock
 COPY package.json yarn.lock ./
@@ -25,7 +29,7 @@ RUN chown -R node:node /app/data \
     && chmod -R 755 /app/data
 
 # Use tini as the entrypoint
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["tini", "--"]
 
 # Don't run as root
 USER node
